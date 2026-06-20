@@ -1,0 +1,10 @@
+node_modules/
+client/node_modules/
+client/dist/
+data/
+agent-state.json
+agent.log
+GUIDE.md
+PLAN.md
+stderr-test.txt
+stdout-test.txt
