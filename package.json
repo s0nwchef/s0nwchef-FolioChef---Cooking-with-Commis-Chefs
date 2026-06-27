@@ -1,19 +1,82 @@
 {
-  "name": "cli-for-web-view",
+  "name": "foliochef",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "FolioChef - Web Terminal Manager",
+  "main": "electron/main.js",
+  "author": "FolioChef",
+  "license": "MIT",
+  "type": "commonjs",
   "scripts": {
     "dev:server": "node server/index.js",
     "dev:client": "cd client && npm run dev",
     "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
     "build": "cd client && npm run build",
-    "start": "node server/index.js"
+    "start": "node server/index.js",
+    "electron:dev": "npm run build && electron .",
+    "electron:build": "npm run build && electron-builder --win --publish never",
+    "electron:build:mac": "npm run build && electron-builder --mac --publish never",
+    "electron:build:linux": "npm run build && electron-builder --linux --publish never",
+    "pack": "npm run build && electron-builder --dir"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
+  "build": {
+    "appId": "com.foliochef.app",
+    "productName": "FolioChef",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "electron/**/*",
+      "server/**/*",
+      "client/dist/**/*",
+      "node_modules/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "client/dist",
+        "to": "client/dist"
+      }
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        },
+        {
+          "target": "portable",
+          "arch": ["x64"]
+        }
+      ],
+      "icon": "electron/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "FolioChef",
+      "installerIcon": "electron/icon.ico",
+      "uninstallerIcon": "electron/icon.ico"
+    },
+    "portable": {
+      "artifactName": "FolioChef-${version}-portable.exe"
+    },
+    "mac": {
+      "target": "dmg",
+      "icon": "electron/icon.icns",
+      "category": "public.app-category.developer-tools"
+    },
+    "linux": {
+      "target": "AppImage",
+      "icon": "electron/icon.png",
+      "category": "Development"
+    },
+    "asar": true,
+    "asarUnpack": [
+      "node_modules/node-pty/**/*"
+    ]
+  },
   "dependencies": {
     "express": "^5.2.1",
     "node-pty": "^1.1.0",
@@ -21,6 +84,8 @@
     "ws": "^8.21.0"
   },
   "devDependencies": {
-    "concurrently": "^10.0.3"
+    "concurrently": "^10.0.3",
+    "electron": "^35.0.0",
+    "electron-builder": "^26.0.0"
   }
 }

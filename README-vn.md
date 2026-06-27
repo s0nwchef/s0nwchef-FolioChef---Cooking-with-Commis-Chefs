@@ -1,13 +1,30 @@
-# FolioChef — Cooking with Commis Chefs
+<p align="center">
+  <img src="release/FolioChef_logo_v2.png" alt="FolioChef Logo" width="400" />
+</p>
 
-Trình quản lý terminal trên web, được tái hiện như một căn bếp chuyên nghiệp.  
+<h1 align="center">FolioChef</h1>
+
+<p align="center">
+  <em>Nấu ăn với các Phụ bếp</em><br/>
+  Trình quản lý terminal trên web, được tái hiện như một căn bếp chuyên nghiệp.
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/node-%3E%3D18-green" alt="Node.js" />
+  <img src="https://img.shields.io/badge/npm-%3E%3D9-blue" alt="npm" />
+  <img src="https://img.shields.io/badge/license-ISC-yellow" alt="License" />
+  <img src="https://img.shields.io/badge/electron-35-purple" alt="Electron" />
+</p>
+
+---
+
 **Bếp trưởng** (bạn) chỉ huy tại pass. Các **Phụ bếp** (AI của bạn) châm lửa terminal, xử lý dữ liệu và giữ mọi station luôn nóng.
 
 ## Căn bếp
 
 - **Đa station trên pass** — Mỗi tab terminal là một station. Bật bao nhiêu tuỳ ý.
 - **Bếp lửa PTY thật** — Shell process thực, nấu nướng real-time qua WebSocket.
-- **Gia vị riêng** — Chọn mood (Expedition 33, Dracula, Nord, Solarized Dark) hoặc tự pha màu nền.
+- **Gia vị riêng** — Chọn mood (Spotify Dark, Dracula, Nord, Solarized Dark) hoặc tự pha màu nền.
 - **Mise en place** — Cỡ chữ, font chữ — chọn dụng cụ vừa tay cho từng station.
 - **Tủ mát** — Tab và lịch sử output được lưu đĩa. Đi đâu quay lại vẫn còn nguyên.
 - **Nhóm lửa / Dọn bàn** — Khởi động lại process ì ạch hoặc xoá output không cần đóng station.
@@ -21,48 +38,82 @@ Trình quản lý terminal trên web, được tái hiện như một căn bếp
 | Pass (Frontend) | React 19, Vite, Tailwind CSS, xterm.js, Zustand |
 | Bếp (Backend) | Express 5, ws, node-pty |
 | Kho (Persistence) | File JSON trên đĩa (`data/`) |
+| Vỏ Electron | Electron 35, electron-builder |
 
-## Vào bếp
+---
 
-### Mài dao
+## Tải về
 
-- **Node.js** >= 18
-- **npm** >= 9
+Tải file `.exe` portable mới nhất từ trang [Releases](https://github.com/anomalyco/cli-for-web-view/releases).
 
-### Chuẩn bị nguyên liệu
+Không cần cài đặt — chỉ cần nhấp đúp `FolioChef.exe` để chạy.
+
+---
+
+## Chạy ứng dụng
+
+### Cách 1 — Ứng dụng desktop (Electron)
+
+> Khuyến nghị. File `.exe` portable, không cần cài Node.js.
+
+1. Tải `FolioChef-x.x.x-portable.exe` từ [Releases](https://github.com/anomalyco/cli-for-web-view/releases).
+2. Nhấp đúp để chạy. App tự khởi động server cục bộ và mở cửa sổ riêng.
+3. Xong.
+
+### Cách 2 — Trình duyệt web (Phát triển)
+
+> Yêu cầu Node.js >= 18.
 
 ```bash
-# Nhập kho (server deps)
+# Clone repo
+git clone https://github.com/anomalyco/cli-for-web-view.git
+cd cli-for-web-view
+
+# Cài dependencies
 npm install
-
-# Dựng pass (client deps)
 cd client && npm install && cd ..
-```
 
-### Nấu menu
-
-```bash
-npm run build
-```
-
-### Phục vụ (Phát triển)
-
-```bash
+# Chạy dev servers (server :3001 + Vite :5173)
 npm run dev
 ```
 
-Chạy song song bếp (server, cổng 3001) và pass (Vite dev server, cổng 5173). Pass proxy `/api` và `/ws` thẳng tới bếp.
+Mở `http://localhost:5173` trên trình duyệt.
 
-### Phục vụ (Production)
+### Cách 3 — Build production (Tự host)
+
+> Yêu cầu Node.js >= 18.
 
 ```bash
+# Build client
 npm run build
+
+# Chạy production server
 npm start
 ```
 
-Mở `http://localhost:3001` — giờ service đã lên.
+Mở `http://localhost:3001`.
 
-## Sơ đồ bếp
+### Build từ nguồn (Electron)
+
+> Yêu cầu Node.js >= 18, npm >= 9, và Visual Studio Build Tools.
+
+```bash
+# Cài dependencies
+npm install
+cd client && npm install && cd ..
+
+# Build client assets
+npm run build
+
+# Build file portable exe
+npx electron-builder --win portable
+```
+
+Output: `release\FolioChef-1.0.0-portable.exe`
+
+---
+
+## Sơ đồ dự án
 
 ```
 ├── client/                    # Pass (React frontend)
@@ -83,7 +134,13 @@ Mở `http://localhost:3001` — giờ service đã lên.
 │   ├── sessionManager.js      # Rotation station
 │   ├── ptyManager.js          # Bếp ga (PTY)
 │   └── historyStore.js        # Sổ nhật ký
+├── electron/                  # Vỏ Electron
+│   ├── main.js                # Main process
+│   ├── icon.ico               # Icon app
+│   └── icon.png               # Icon nguồn
 ├── data/                      # Tủ mát (dữ liệu runtime)
+├── build.bat                  # Script build (CMD)
+├── build.ps1                  # Script build (PowerShell)
 └── package.json               # Công thức nấu ăn
 ```
 
@@ -99,6 +156,8 @@ Mở `http://localhost:3001` — giờ service đã lên.
 | DELETE | `/api/history/:id` | Xoá bảng station |
 | POST | `/api/tabs/:id/restart` | Nhóm lửa lại |
 | WS | `/ws?tabId=&cols=&rows=&command=&cwd=` | Kết nối trực tiếp tới bếp |
+
+---
 
 ## Giấy phép
 

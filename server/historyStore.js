@@ -1,10 +1,23 @@
 const fs = require('fs');
 const path = require('path');
 
-const HISTORY_DIR = path.join(__dirname, '../data/history');
-const TABS_FILE = path.join(__dirname, '../data/tabs.json');
+function getDataDir() {
+  if (process.env.FOLIOCHEF_DATA) {
+    return process.env.FOLIOCHEF_DATA;
+  }
+  try {
+    const { app } = require('electron');
+    if (app && app.isPackaged) {
+      return path.join(app.getPath('userData'), 'data');
+    }
+  } catch (e) { /* not in electron */ }
+  return path.join(__dirname, '../data');
+}
 
-// Đảm bảo các thư mục tồn tại
+const DATA_DIR = getDataDir();
+const HISTORY_DIR = path.join(DATA_DIR, 'history');
+const TABS_FILE = path.join(DATA_DIR, 'tabs.json');
+
 if (!fs.existsSync(HISTORY_DIR)) {
   fs.mkdirSync(HISTORY_DIR, { recursive: true });
 }

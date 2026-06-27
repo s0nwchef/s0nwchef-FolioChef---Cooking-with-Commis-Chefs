@@ -1,13 +1,30 @@
-# FolioChef — Cooking with Commis Chefs
+<p align="center">
+  <img src="release/FolioChef_logo_v2.png" alt="FolioChef Logo" width="400" />
+</p>
 
-A Web Terminal Manager, reimagined as a professional kitchen.  
+<h1 align="center">FolioChef</h1>
+
+<p align="center">
+  <em>Cooking with Commis Chefs</em><br/>
+  A Web Terminal Manager, reimagined as a professional kitchen.
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/node-%3E%3D18-green" alt="Node.js" />
+  <img src="https://img.shields.io/badge/npm-%3E%3D9-blue" alt="npm" />
+  <img src="https://img.shields.io/badge/license-ISC-yellow" alt="License" />
+  <img src="https://img.shields.io/badge/electron-35-purple" alt="Electron" />
+</p>
+
+---
+
 The **Head Chef** (you) commands the pass. The **Commis Chefs** (your AI assistants) fire up terminals, chop data, and keep every station running.
 
 ## The Kitchen
 
 - **Multi-station pass** — Every terminal tab is a station. Fire up as many as you need.
 - **Live PTY grills** — Real shell processes searing in real time over WebSocket.
-- **Signature themes** — Pick a mood (Expedition 33, Dracula, Nord, Solarized Dark) or craft your own backdrop colour.
+- **Signature themes** — Pick a mood (Spotify Dark, Dracula, Nord, Solarized Dark) or craft your own backdrop colour.
 - **Mise en place** — Font size, font family — dial in your tools so every station feels right.
 - **Walk-in cooler** — Tabs and output history are saved to disk. Walk away, come back — it's all there.
 - **Fire / Clean** — Restart a sluggish process or wipe the board without closing the station.
@@ -21,48 +38,82 @@ The **Head Chef** (you) commands the pass. The **Commis Chefs** (your AI assista
 | Pass (Frontend) | React 19, Vite, Tailwind CSS, xterm.js, Zustand |
 | Kitchen (Backend) | Express 5, ws, node-pty |
 | Pantry (Persistence) | JSON files on disk (`data/`) |
+| Desktop Shell | Electron 35, electron-builder |
 
-## Getting to Work
+---
 
-### Sharpening Your Knives
+## Download
 
-- **Node.js** >= 18
-- **npm** >= 9
+Download the latest portable `.exe` from the [Releases](https://github.com/anomalyco/cli-for-web-view/releases) page.
 
-### Prepping the Station
+No installation required — just double-click `FolioChef.exe` to launch.
+
+---
+
+## Running the App
+
+### Option 1 — Desktop App (Electron)
+
+> Recommended. Single portable `.exe`, no Node.js required.
+
+1. Download `FolioChef-x.x.x-portable.exe` from [Releases](https://github.com/anomalyco/cli-for-web-view/releases).
+2. Double-click to run. The app starts a local server and opens in its own window.
+3. Done.
+
+### Option 2 — Web Browser (Development)
+
+> Requires Node.js >= 18.
 
 ```bash
-# Stock the pantry (server deps)
+# Clone the repo
+git clone https://github.com/anomalyco/cli-for-web-view.git
+cd cli-for-web-view
+
+# Install dependencies
 npm install
-
-# Set up the pass (client deps)
 cd client && npm install && cd ..
-```
 
-### Building the Menu
-
-```bash
-npm run build
-```
-
-### Service (Development)
-
-```bash
+# Start dev servers (server :3001 + Vite :5173)
 npm run dev
 ```
 
-Runs the kitchen (server, port 3001) and the pass (Vite dev server, port 5173) side by side. The pass proxies `/api` and `/ws` straight to the kitchen.
+Open `http://localhost:5173` in your browser.
 
-### Service (Production)
+### Option 3 — Production Build (Self-hosted)
+
+> Requires Node.js >= 18.
 
 ```bash
+# Build the client
 npm run build
+
+# Start the production server
 npm start
 ```
 
-Open `http://localhost:3001` — service is live.
+Open `http://localhost:3001`.
 
-## The Kitchen Layout
+### Building from Source (Electron)
+
+> Requires Node.js >= 18, npm >= 9, and Visual Studio Build Tools.
+
+```bash
+# Install dependencies
+npm install
+cd client && npm install && cd ..
+
+# Build client assets
+npm run build
+
+# Build portable exe
+npx electron-builder --win portable
+```
+
+Output: `release\FolioChef-1.0.0-portable.exe`
+
+---
+
+## Project Layout
 
 ```
 ├── client/                    # The Pass (React frontend)
@@ -83,7 +134,13 @@ Open `http://localhost:3001` — service is live.
 │   ├── sessionManager.js      # Station rotation
 │   ├── ptyManager.js          # The stoves (PTY)
 │   └── historyStore.js        # The logbook
+├── electron/                  # Electron shell
+│   ├── main.js                # Main process
+│   ├── icon.ico               # App icon
+│   └── icon.png               # App icon source
 ├── data/                      # Walk-in cooler (runtime data)
+├── build.bat                  # Build script (CMD)
+├── build.ps1                  # Build script (PowerShell)
 └── package.json               # The recipe book
 ```
 
@@ -99,6 +156,8 @@ Open `http://localhost:3001` — service is live.
 | DELETE | `/api/history/:id` | Wipe the station's board |
 | POST | `/api/tabs/:id/restart` | Relight the burner |
 | WS | `/ws?tabId=&cols=&rows=&command=&cwd=` | Live connection to the stove |
+
+---
 
 ## License
 

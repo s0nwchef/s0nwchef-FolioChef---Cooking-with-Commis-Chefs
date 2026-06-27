@@ -1,6 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 const THEMES = {
+  'Spotify Dark': {
+    background: '#121212', foreground: '#FFFFFF', cursor: '#1ED760', cursorAccent: '#121212',
+    black: '#121212', red: '#E61E32', green: '#1ED760', yellow: '#BD5839', blue: '#1078C0',
+    magenta: '#B85860', cyan: '#687A80', white: '#FFFFFF',
+    brightBlack: '#1F1F1F', brightRed: '#E61E32', brightGreen: '#1ED760', brightYellow: '#BD5839',
+    brightBlue: '#1078C0', brightMagenta: '#B85860', brightCyan: '#687A80', brightWhite: '#FFFFFF',
+  },
   'Expedition 33': {
     background: '#0A0B14', foreground: '#E8E0D0', cursor: '#C9A96E', cursorAccent: '#0A0B14',
     black: '#1A1820', red: '#C97B8A', green: '#8BAF7A', yellow: '#C9A96E', blue: '#7A9BBF',
@@ -52,32 +59,40 @@ function saveToLS(key, val) {
 }
 
 const slider = [
-  'flex-1 h-1.5 appearance-none bg-[#2A2B3E] rounded-full outline-none cursor-pointer',
+  'flex-1 h-1.5 appearance-none bg-neutral-dark-3 rounded-full outline-none cursor-pointer',
   '[&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3.5 [&::-webkit-slider-thumb]:h-3.5',
-  '[&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[#C9A96E] [&::-webkit-slider-thumb]:cursor-pointer',
+  '[&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-spotify-green [&::-webkit-slider-thumb]:cursor-pointer',
 ].join(' ');
 
 const selectCls = [
-  'w-full bg-[#1E1F32] border border-[#C9A96E]/30 text-[#E8E0D0] text-sm rounded-[16px] px-2 py-1.5',
-  'outline-none cursor-pointer focus:border-[#C9A96E]/70',
+  'w-full bg-surface-container border border-spotify-green/30 text-neutral-white text-body rounded-card px-3 py-2',
+  'outline-none cursor-pointer focus:border-spotify-green/70',
 ].join(' ');
 
+function getInitialSettings() {
+  const saved = loadFromLS(STORAGE_KEY);
+  return {
+    fontSize: saved?.fontSize ?? 14,
+    fontFamily: saved?.fontFamily ?? FONT_OPTIONS[0],
+    theme: saved?.theme ?? 'Spotify Dark',
+    customBg: saved?.customBg ?? '#121212',
+  };
+}
+
 export default function SettingsPanel({ term, fitAddon, onClose }) {
-  const [fontSize, setFontSize] = useState(14);
-  const [fontFamily, setFontFamily] = useState(FONT_OPTIONS[0]);
-  const [selectedTheme, setSelectedTheme] = useState('Expedition 33');
-  const [customBg, setCustomBg] = useState('#0A0B14');
+  const [fontSize, setFontSize] = useState(() => getInitialSettings().fontSize);
+  const [fontFamily, setFontFamily] = useState(() => getInitialSettings().fontFamily);
+  const [selectedTheme, setSelectedTheme] = useState(() => getInitialSettings().theme);
+  const [customBg, setCustomBg] = useState(() => getInitialSettings().customBg);
+  const isInitialMount = useRef(true);
 
   useEffect(() => {
-    const saved = loadFromLS(STORAGE_KEY);
-    if (saved) {
-      setFontSize(saved.fontSize ?? 14);
-      setFontFamily(saved.fontFamily ?? FONT_OPTIONS[0]);
-      setSelectedTheme(saved.theme ?? 'Expedition 33');
-      if (saved.customBg) setCustomBg(saved.customBg);
-      if (term) applyTermSettings(saved, term, fitAddon);
+    if (isInitialMount.current && term) {
+      const saved = loadFromLS(STORAGE_KEY);
+      if (saved) applyTermSettings(saved, term, fitAddon);
+      isInitialMount.current = false;
     }
-  }, [term]);
+  }, [term, fitAddon]);
 
   function applyTermSettings(settings, t, fit) {
     t.options.fontSize = settings.fontSize ?? 14;
@@ -113,31 +128,27 @@ export default function SettingsPanel({ term, fitAddon, onClose }) {
     <div className="fixed inset-0 z-40 flex items-start justify-end" onClick={onClose}>
       <div
         onClick={e => e.stopPropagation()}
-        className="relative z-50 w-80 mt-14 mr-4 bg-[#16172A] border border-[#C9A96E]/40 rounded-[16px] shadow-[0_8px_32px_rgba(0,0,0,0.6)] overflow-hidden"
+        className="relative z-50 w-80 mt-14 mr-4 bg-surface-container border border-spotify-green/40 rounded-card shadow-overlay overflow-hidden"
         style={{ animation: 'panelIn 150ms ease', maxHeight: 'calc(100vh - 100px)' }}
       >
-        <style>{`
-          @keyframes panelIn { from { opacity:0; transform:translateY(-6px) scale(0.97); } to { opacity:1; transform:translateY(0) scale(1); } }
-        `}</style>
-
-        <div className="flex items-center justify-between px-4 py-2.5 border-b border-[#C9A96E]/20 shrink-0">
-          <span className="text-[#E8E0D0] font-sans text-sm font-semibold tracking-wide">Terminal Settings</span>
-          <button onClick={onClose} className="text-[#8B8FA8] hover:text-[#E8E0D0] text-lg leading-none transition-colors">&times;</button>
+        <div className="flex items-center justify-between px-4 py-3 border-b border-spotify-green/20 shrink-0">
+          <span className="text-neutral-white font-sans text-body font-semibold tracking-wide">Terminal Settings</span>
+          <button onClick={onClose} className="text-interactive-light hover:text-neutral-white text-lg leading-none transition-colors">&times;</button>
         </div>
 
         <div className="p-4 space-y-4 font-sans overflow-y-auto" style={{ maxHeight: 'calc(100vh - 160px)' }}>
           <div>
-            <label className="text-[#8B8FA8] text-xs uppercase tracking-wider block mb-1">Font Size</label>
+            <label className="text-interactive-light text-body-sm uppercase tracking-wider block mb-2">Font Size</label>
             <div className="flex items-center gap-3">
               <input type="range" min="10" max="24" step="1" value={fontSize}
                 onChange={e => { const v = Number(e.target.value); setFontSize(v); updateTerm({ fontSize: v }); }}
                 className={slider} />
-              <span className="text-[#E8E0D0] font-mono text-xs w-6 text-right">{fontSize}</span>
+              <span className="text-neutral-white font-mono text-caption w-6 text-right">{fontSize}</span>
             </div>
           </div>
 
           <div>
-            <label className="text-[#8B8FA8] text-xs uppercase tracking-wider block mb-1">Font Family</label>
+            <label className="text-interactive-light text-body-sm uppercase tracking-wider block mb-2">Font Family</label>
             <select value={fontFamily}
               onChange={e => { const v = e.target.value; setFontFamily(v); updateTerm({ fontFamily: v }); }}
               className={selectCls}>
@@ -146,7 +157,7 @@ export default function SettingsPanel({ term, fitAddon, onClose }) {
           </div>
 
           <div>
-            <label className="text-[#8B8FA8] text-xs uppercase tracking-wider block mb-1">Theme Preset</label>
+            <label className="text-interactive-light text-body-sm uppercase tracking-wider block mb-2">Theme Preset</label>
             <select value={selectedTheme}
               onChange={e => handleThemeSelect(e.target.value)}
               className={selectCls}>
@@ -156,15 +167,14 @@ export default function SettingsPanel({ term, fitAddon, onClose }) {
           </div>
 
           <div>
-            <label className="text-[#8B8FA8] text-xs uppercase tracking-wider block mb-1">Background Color</label>
+            <label className="text-interactive-light text-body-sm uppercase tracking-wider block mb-2">Background Color</label>
             <div className="flex items-center gap-3">
               <input type="color" value={customBg}
                 onChange={e => { const v = e.target.value; setCustomBg(v); setSelectedTheme('Custom'); updateTerm({ theme: 'Custom', customBg: v }); }}
-                className="w-9 h-9 rounded-[16px] cursor-pointer border border-[#C9A96E]/30 bg-transparent p-0.5" />
-              <span className="text-[#8B8FA8] font-mono text-xs">{customBg}</span>
+                className="w-9 h-9 rounded-card cursor-pointer border border-spotify-green/30 bg-transparent p-0.5" />
+              <span className="text-interactive-light font-mono text-caption">{customBg}</span>
             </div>
           </div>
-
         </div>
       </div>
     </div>

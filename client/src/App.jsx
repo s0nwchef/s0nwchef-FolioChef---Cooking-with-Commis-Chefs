@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import Sidebar from './components/Sidebar';
 import TerminalPane from './components/Terminal';
 import NewTabDialog from './components/NewTabDialog';
@@ -10,10 +10,10 @@ export default function App() {
   const { tabs, activeTabId, setTabs, setActiveTab, addTab, removeTab } = useStore();
   const [showNewTabDialog, setShowNewTabDialog] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
-  const termsRef = useRef({});
+  const [termData, setTermData] = useState({});
 
   useEffect(() => {
-    try { localStorage.removeItem('terminal-bg'); } catch {}
+    try { localStorage.removeItem('terminal-bg'); } catch { /* ignore */ }
   }, []);
 
   useEffect(() => {
@@ -26,9 +26,9 @@ export default function App() {
       .catch(() => {});
   }, []);
 
-  const handleTermReady = (id, term, fitAddon) => {
-    termsRef.current[id] = { term, fitAddon };
-  };
+  const handleTermReady = useCallback((id, term, fitAddon) => {
+    setTermData(prev => ({ ...prev, [id]: { term, fitAddon } }));
+  }, []);
 
   const handleNewTab = (name, command, cwd) => {
     setShowNewTabDialog(false);
@@ -48,7 +48,11 @@ export default function App() {
   const handleCloseTab = async (id) => {
     await fetch(`/api/tabs/${id}`, { method: 'DELETE' });
     removeTab(id);
-    delete termsRef.current[id];
+    setTermData(prev => {
+      const newData = { ...prev };
+      delete newData[id];
+      return newData;
+    });
   };
 
   const handleRestartProcess = async () => {
@@ -62,7 +66,7 @@ export default function App() {
   };
 
   const activeTab = tabs.find(t => t.id === activeTabId);
-  const activeTermData = termsRef.current[activeTabId] || {};
+  const activeTermData = termData[activeTabId] || { term: null, fitAddon: null };
 
   return (
     <>
@@ -76,46 +80,46 @@ export default function App() {
 
       <main className="flex flex-col flex-1 h-full bg-surface overflow-hidden">
         {activeTab && (
-          <div className="flex items-center gap-4 px-5 py-2 bg-surface-container/40 border-b border-outline-variant/10 shrink-0">
+          <div className="flex items-center gap-4 px-8 py-2 bg-surface-container/40 border-b border-white/5 shrink-0">
             <button
               onClick={handleRestartProcess}
-              className="flex items-center gap-1.5 px-3 py-1.5 border border-primary/25 text-primary/80 hover:text-primary hover:bg-primary/8 rounded-[16px] text-toolbar uppercase tracking-wider transition-all duration-150"
+              className="flex items-center gap-1.5 px-3 py-1.5 border border-spotify-green/25 text-spotify-green/80 hover:text-spotify-green hover:bg-spotify-green/8 rounded-pill text-body-sm uppercase tracking-wider transition-all duration-150"
             >
               <span className="material-symbols-outlined text-sm">restart_alt</span>
               Restart
             </button>
             <button
               onClick={handleClearHistory}
-              className="flex items-center gap-1.5 px-3 py-1.5 border border-outline-variant/30 text-on-surface-variant/60 hover:text-primary hover:border-primary/25 hover:bg-primary/5 rounded-[16px] text-toolbar uppercase tracking-wider transition-all duration-150"
+              className="flex items-center gap-1.5 px-3 py-1.5 border border-white/10 text-interactive-light/60 hover:text-spotify-green hover:border-spotify-green/25 hover:bg-spotify-green/5 rounded-pill text-body-sm uppercase tracking-wider transition-all duration-150"
             >
               <span className="material-symbols-outlined text-sm">delete_sweep</span>
               Clear
             </button>
             <button
               onClick={() => setShowSettings(v => !v)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 border rounded-[16px] text-toolbar uppercase tracking-wider transition-all duration-150 ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 border rounded-pill text-body-sm uppercase tracking-wider transition-all duration-150 ${
                 showSettings
-                  ? 'bg-primary/12 border-primary/40 text-primary'
-                  : 'border-outline-variant/30 text-on-surface-variant/60 hover:text-primary hover:border-primary/25 hover:bg-primary/5'
+                  ? 'bg-spotify-green/12 border-spotify-green/40 text-spotify-green'
+                  : 'border-white/10 text-interactive-light/60 hover:text-spotify-green hover:border-spotify-green/25 hover:bg-spotify-green/5'
               }`}
             >
               <span className="material-symbols-outlined text-sm">settings</span>
               Settings
             </button>
-            <div className="ml-auto flex items-center gap-2 text-on-surface-variant/40 text-toolbar uppercase tracking-wider">
-              <span className="w-1.5 h-1.5 rounded-full bg-primary/60" />
+            <div className="ml-auto flex items-center gap-2 text-interactive-light/40 text-body-sm uppercase tracking-wider">
+              <span className="w-1.5 h-1.5 rounded-full bg-spotify-green/60" />
               {activeTab.name}
             </div>
           </div>
         )}
 
         <div className="flex-1 p-4 overflow-hidden relative">
-          <div className="w-full h-full rounded-[16px] border border-primary-container/15 overflow-hidden bg-surface-container-lowest shadow-[0_4px_24px_rgba(0,0,0,0.5)]">
-            <div className="h-7 bg-surface-container-low border-b border-primary-container/8 flex items-center px-3 gap-1.5 shrink-0">
-              <div className="w-2.5 h-2.5 rounded-full border border-outline-variant/40 bg-background/40" />
-              <div className="w-2.5 h-2.5 rounded-full border border-outline-variant/40 bg-background/40" />
-              <div className="w-2.5 h-2.5 rounded-full border border-outline-variant/40 bg-background/40" />
-              <span className="ml-3 text-[10px] text-on-surface-variant/30 tracking-widest uppercase font-mono">
+          <div className="w-full h-full rounded-card border border-spotify-green/15 overflow-hidden bg-surface shadow-overlay">
+            <div className="h-7 bg-surface-container-low border-b border-white/8 flex items-center px-3 gap-1.5 shrink-0">
+              <div className="w-2.5 h-2.5 rounded-full border border-white/40 bg-surface/40" />
+              <div className="w-2.5 h-2.5 rounded-full border border-white/40 bg-surface/40" />
+              <div className="w-2.5 h-2.5 rounded-full border border-white/40 bg-surface/40" />
+              <span className="ml-3 text-[10px] text-interactive-light/30 tracking-widest uppercase font-mono">
                 {activeTab ? `${activeTab.name} — tty` : '—  no session'}
               </span>
             </div>
@@ -124,7 +128,7 @@ export default function App() {
                 <TerminalPane key={tab.id} tab={tab} isActive={tab.id === activeTabId} onReady={handleTermReady} />
               ))}
               {tabs.length === 0 && (
-                <div className="flex items-center justify-center h-full text-on-surface-variant/25 font-sans text-base italic">
+                <div className="flex items-center justify-center h-full text-interactive-light/25 font-sans text-body-lg italic">
                   No sessions. Click + to create one.
                 </div>
               )}

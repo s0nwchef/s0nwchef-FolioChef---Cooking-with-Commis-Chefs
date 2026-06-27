@@ -4,32 +4,157 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  background-color: #12131e;
-  color: #e2e1f1;
-  margin: 0;
-  overflow: hidden;
-  font-family: Cambria, Georgia, serif;
+@layer base {
+  body {
+    background-color: #121212;
+    color: #FFFFFF;
+    margin: 0;
+    overflow: hidden;
+    font-family: 'SpotifyMixUI', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.25);
+  }
 }
 
-.terminal-scroll::-webkit-scrollbar {
-  width: 6px;
+@layer components {
+  .terminal-scroll::-webkit-scrollbar {
+    width: 6px;
+  }
+  .terminal-scroll::-webkit-scrollbar-track {
+    background: #121212;
+  }
+  .terminal-scroll::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 3px;
+  }
+  .terminal-scroll::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.25);
+  }
+
+  .btn-primary {
+    @apply bg-spotify-green text-neutral-black font-button rounded-pill;
+    @apply px-8 py-3 h-12;
+    @apply transition-all duration-150;
+    @apply hover:bg-spotify-green-dark active:bg-spotify-green-active;
+    @apply focus:shadow-focus outline-none;
+    @apply disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-secondary {
+    @apply bg-interactive-dark text-neutral-white font-button-sm rounded-pill;
+    @apply px-6 py-2 h-10 border border-neutral-white;
+    @apply transition-all duration-150;
+    @apply hover:bg-white/10 active:bg-white/20;
+    @apply focus:shadow-focus outline-none;
+  }
+
+  .btn-ghost {
+    @apply bg-transparent text-interactive-light font-button-sm rounded-pill;
+    @apply px-4 py-1 h-8;
+    @apply transition-all duration-150;
+    @apply hover:text-neutral-white active:text-spotify-green;
+    @apply focus:shadow-focus outline-none;
+  }
+
+  .btn-icon {
+    @apply bg-surface-container text-neutral-white rounded-full;
+    @apply w-12 h-12 p-3 flex items-center justify-center;
+    @apply transition-all duration-150;
+    @apply hover:bg-neutral-dark-2 active:bg-neutral-dark-3;
+    @apply focus:shadow-focus outline-none;
+  }
+
+  .btn-icon-sm {
+    @apply bg-transparent text-interactive-light rounded-full;
+    @apply w-6 h-6 p-0 flex items-center justify-center;
+    @apply transition-all duration-150;
+    @apply hover:text-neutral-white;
+    @apply focus:shadow-focus outline-none;
+  }
+
+  .card {
+    @apply bg-transparent text-neutral-white rounded-card p-3;
+    @apply transition-all duration-150;
+    @apply hover:bg-white/10 hover:scale-[1.02];
+  }
+
+  .input-dark {
+    @apply bg-surface-container text-neutral-white rounded-pill;
+    @apply px-12 py-3 h-12;
+    @apply transition-all duration-150;
+    @apply placeholder:text-interactive-light;
+    @apply focus:bg-neutral-dark-2 focus:shadow-focus outline-none;
+  }
+
+  .input-light {
+    @apply bg-neutral-white text-neutral-black rounded-pill;
+    @apply px-4 py-1.5 text-body-sm;
+    @apply border border-border-dark;
+    @apply transition-all duration-150;
+    @apply placeholder:text-neutral-warm-gray;
+    @apply focus:border-neutral-black focus:shadow-[0_0_0_2px_rgba(0,0,0,0.1)] outline-none;
+  }
+
+  .badge-success {
+    @apply bg-spotify-green text-neutral-black rounded-pill;
+    @apply px-2 py-1 text-caption font-bold;
+  }
+
+  .badge-error {
+    @apply bg-error text-neutral-white rounded-pill;
+    @apply px-2 py-1 text-caption font-bold;
+  }
+
+  .nav-link {
+    @apply text-interactive-light font-body px-3 py-2 rounded-subtle;
+    @apply transition-all duration-150;
+    @apply hover:text-neutral-white;
+  }
+
+  .nav-link-active {
+    @apply text-neutral-white font-bold bg-white/10;
+  }
 }
-.terminal-scroll::-webkit-scrollbar-track {
-  background: #0c0d18;
-}
-.terminal-scroll::-webkit-scrollbar-thumb {
-  background: #4d463a;
-  border-radius: 3px;
-}
-.terminal-scroll::-webkit-scrollbar-thumb:hover {
-  background: #c9a96e;
+
+@layer utilities {
+  .cursor-blink {
+    animation: blink 1s step-end infinite;
+  }
 }
 
 @keyframes blink {
   0%, 100% { opacity: 1; }
   50% { opacity: 0; }
 }
-.cursor-blink {
-  animation: blink 1s step-end infinite;
+
+@keyframes dialogIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes panelIn {
+  from { opacity: 0; transform: translateY(-6px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }

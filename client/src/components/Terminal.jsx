@@ -2,9 +2,16 @@ import { useEffect, useRef } from 'react';
 import { Terminal } from '@xterm/xterm';
 import { FitAddon } from '@xterm/addon-fit';
 
-const WS_BASE = `ws://localhost:3001/ws`;
+const WS_BASE = `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/ws`;
 
 const THEMES = {
+  'Spotify Dark': {
+    background: '#121212', foreground: '#FFFFFF', cursor: '#1ED760', cursorAccent: '#121212',
+    black: '#121212', red: '#E61E32', green: '#1ED760', yellow: '#BD5839', blue: '#1078C0',
+    magenta: '#B85860', cyan: '#687A80', white: '#FFFFFF',
+    brightBlack: '#1F1F1F', brightRed: '#E61E32', brightGreen: '#1ED760', brightYellow: '#BD5839',
+    brightBlue: '#1078C0', brightMagenta: '#B85860', brightCyan: '#687A80', brightWhite: '#FFFFFF',
+  },
   'Expedition 33': {
     background: '#0A0B14', foreground: '#E8E0D0', cursor: '#C9A96E', cursorAccent: '#0A0B14',
     black: '#1A1820', red: '#C97B8A', green: '#8BAF7A', yellow: '#C9A96E', blue: '#7A9BBF',
@@ -41,19 +48,19 @@ function loadSettings() {
 
 function getThemeBackground() {
   const saved = loadSettings();
-  const themeName = saved?.theme && THEMES[saved.theme] ? saved.theme : 'Expedition 33';
+  const themeName = saved?.theme && THEMES[saved.theme] ? saved.theme : 'Spotify Dark';
   if (saved?.theme === 'Custom' && saved?.customBg) return saved.customBg;
   return THEMES[themeName].background;
 }
 
 function buildOptions() {
   const saved = loadSettings();
-  const themeName = saved?.theme && THEMES[saved.theme] ? saved.theme : 'Expedition 33';
+  const themeName = saved?.theme && THEMES[saved.theme] ? saved.theme : 'Spotify Dark';
   return {
     cursorBlink: true,
     cursorStyle: 'underline',
     fontSize: saved?.fontSize ?? 14,
-    fontFamily: saved?.fontFamily ?? 'Courier Prime, Courier New, monospace',
+    fontFamily: saved?.fontFamily ?? 'JetBrains Mono, Fira Code, Courier Prime, monospace',
     letterSpacing: 0,
     lineHeight: 1.6,
     theme: { ...THEMES[themeName], background: getThemeBackground() },
@@ -103,7 +110,7 @@ export default function TerminalPane({ tab, isActive, onReady }) {
         const msg = JSON.parse(e.data);
         if (msg.type === 'output') term.write(msg.data);
         if (msg.type === 'exit') term.write('\r\n\x1b[33m[Process exited]\x1b[0m\r\n');
-      } catch (err) {}
+      } catch { /* ignore parse errors */ }
     };
 
     term.onData(data => {
@@ -119,7 +126,7 @@ export default function TerminalPane({ tab, isActive, onReady }) {
         if (ws.readyState === WebSocket.OPEN) {
           ws.send(JSON.stringify({ type: 'resize', cols, rows }));
         }
-      } catch (err) {}
+      } catch { /* ignore resize errors */ }
     });
 
     resizeObserver.observe(containerRef.current);

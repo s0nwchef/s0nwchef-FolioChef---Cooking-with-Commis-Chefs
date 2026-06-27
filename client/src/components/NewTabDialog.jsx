@@ -22,65 +22,59 @@ export default function NewTabDialog({ onConfirm, onCancel }) {
     <div
       onClick={onCancel}
       className="fixed inset-0 z-50 flex items-center justify-center"
-      style={{ background: 'rgba(10, 11, 20, 0.88)', backdropFilter: 'blur(6px)' }}
+      style={{ background: 'rgba(0, 0, 0, 0.7)', backdropFilter: 'blur(4px)' }}
     >
-      <style>{`
-        @keyframes dialogIn {
-          from { opacity: 0; transform: scale(0.96); }
-          to   { opacity: 1; transform: scale(1); }
-        }
-      `}</style>
       <form
         onClick={e => e.stopPropagation()}
         onSubmit={handleSubmit}
         style={{ animation: 'dialogIn 160ms ease' }}
-        className="bg-surface-container-lowest border border-primary/40 rounded-[16px] p-6 w-[420px] flex flex-col gap-4 shadow-[0_12px_40px_rgba(0,0,0,0.5)]"
+        className="bg-surface-container border border-white/10 rounded-card p-8 w-[420px] flex flex-col gap-4 shadow-overlay"
       >
-        <div className="text-primary font-sans text-lg tracking-wide font-semibold">
+        <div className="text-neutral-white font-display text-heading-2 tracking-wide">
           New Session
         </div>
 
         <div className="flex flex-col gap-1">
-          <label className="text-on-surface-variant/60 font-sans text-xs uppercase tracking-wider">Name</label>
+          <label className="text-interactive-light text-body-sm uppercase tracking-wider">Name</label>
           <input
             ref={nameRef}
             value={name}
             onChange={e => setName(e.target.value)}
-            className="bg-transparent border-b border-primary/40 text-on-surface font-sans text-sm outline-none px-0 py-1.5 transition-colors focus:border-primary"
+            className="bg-transparent border-b border-white/20 text-neutral-white font-sans text-body outline-none px-0 py-2 transition-colors focus:border-spotify-green"
           />
         </div>
 
         <div className="flex flex-col gap-1">
-          <label className="text-on-surface-variant/60 font-sans text-xs uppercase tracking-wider">Command</label>
+          <label className="text-interactive-light text-body-sm uppercase tracking-wider">Command</label>
           <input
             value={command}
             onChange={e => setCommand(e.target.value)}
-            className="bg-transparent border-b border-primary/40 text-on-surface font-sans text-sm outline-none px-0 py-1.5 transition-colors focus:border-primary"
+            className="bg-transparent border-b border-white/20 text-neutral-white font-sans text-body outline-none px-0 py-2 transition-colors focus:border-spotify-green"
             placeholder="leave empty for default shell"
           />
         </div>
 
         <div className="flex flex-col gap-1">
-          <label className="text-on-surface-variant/60 font-sans text-xs uppercase tracking-wider">Directory</label>
+          <label className="text-interactive-light text-body-sm uppercase tracking-wider">Directory</label>
           <input
             value={cwd}
             onChange={e => setCwd(e.target.value)}
-            className="bg-transparent border-b border-primary/40 text-on-surface font-sans text-sm outline-none px-0 py-1.5 transition-colors focus:border-primary"
+            className="bg-transparent border-b border-white/20 text-neutral-white font-sans text-body outline-none px-0 py-2 transition-colors focus:border-spotify-green"
             placeholder="leave empty for home folder"
           />
         </div>
 
-        <div className="flex justify-end gap-3 mt-1">
+        <div className="flex justify-end gap-3 mt-2">
           <button
             type="button"
             onClick={onCancel}
-            className="bg-transparent border-none text-on-surface-variant/60 font-sans text-sm cursor-pointer px-4 py-1.5 rounded-[16px] transition-colors hover:text-on-surface-variant"
+            className="bg-transparent border-none text-interactive-light font-sans text-body cursor-pointer px-4 py-2 rounded-pill transition-colors hover:text-neutral-white"
           >
             Cancel
           </button>
           <button
             type="submit"
-            className="bg-primary border-none text-on-primary font-sans text-sm font-semibold cursor-pointer px-5 py-1.5 rounded-[16px] transition-all hover:brightness-110"
+            className="bg-spotify-green border-none text-neutral-black font-sans text-body font-bold cursor-pointer px-6 py-2 rounded-pill transition-all hover:bg-spotify-green-dark active:bg-spotify-green-active"
           >
             Create
           </button>
